@@ -7,6 +7,6 @@
         public DateTime CreatedDate { get; set; }
         public float Salary { get; set; }
         public int OfficeId { get; set; }
-        public Office? Office { get; set; }
+        public OfficeDto? OfficeDto { get; set; }
     }
 }

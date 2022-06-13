@@ -11,7 +11,8 @@ namespace EmployeeManagement.AutoMapperHelper
         {
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, UserLoginDto>().ReverseMap();
-
+            CreateMap<Employee, EmployeeDto>().ReverseMap();
+            CreateMap<Office, OfficeDto>().ReverseMap();
         }
     }
 }
