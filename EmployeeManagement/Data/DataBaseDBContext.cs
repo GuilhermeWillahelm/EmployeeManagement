@@ -3,6 +3,7 @@ using EmployeeManagement.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using EmployeeManagement.Dtos;
 
 namespace EmployeeManagement.Data
 {
