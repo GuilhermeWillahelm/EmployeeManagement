@@ -1,8 +1,8 @@
 ﻿using EmployeeManagement.Dtos;
 
-namespace EmployeeManagement.Repositories
+namespace EmployeeManagement.Services
 {
-    public interface IUserRepository
+    public interface IUserService
     {
         Task<IEnumerable<UserDto>> GetUsers();
         Task<UserDto> GetUser(int id);

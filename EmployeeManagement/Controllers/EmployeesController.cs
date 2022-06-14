@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using EmployeeManagement.Repositories;
+using EmployeeManagement.Services;
 using EmployeeManagement.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,25 +18,25 @@ namespace EmployeeManagement.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly DataBaseDBContext _context;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeesController(IEmployeeRepository employeeRepository)
+        public EmployeesController(IEmployeeService employeeService)
         {
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
         }
 
         // GET: api/Employees
         [HttpGet]
         public async Task<IEnumerable<EmployeeDto>> GetEmployees()
         {
-            return await _employeeRepository.GetEmployees();
+            return await _employeeService.GetEmployees();
         }
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
-            var employee = await _employeeRepository.GetEmployee(id);
+            var employee = await _employeeService.GetEmployee(id);
 
             if (employee == null)
             {
@@ -57,7 +58,7 @@ namespace EmployeeManagement.Controllers
 
             try
             {
-                await _employeeRepository.UpdateEmploye(id, employee);
+                await _employeeService.UpdateEmploye(id, employee);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -79,7 +80,7 @@ namespace EmployeeManagement.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee)
         {
-            await _employeeRepository.CreateEmploye(employee);
+            await _employeeService.CreateEmploye(employee);
 
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
         }
@@ -89,7 +90,7 @@ namespace EmployeeManagement.Controllers
         public async Task<IActionResult> DeleteEmployee(int id)
         {
 
-            var employee = await _employeeRepository.DeleteEmploye(id);
+            var employee = await _employeeService.DeleteEmploye(id);
 
             if (employee == null)
             {

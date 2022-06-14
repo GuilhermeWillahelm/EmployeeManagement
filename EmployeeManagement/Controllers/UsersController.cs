@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManagement.Data;
+using EmployeeManagement.Dtos;
+using EmployeeManagement.Services;
 using EmployeeManagement.Identity;
 
 namespace EmployeeManagement.Controllers
@@ -15,32 +17,34 @@ namespace EmployeeManagement.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DataBaseDBContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(DataBaseDBContext context)
+        public UsersController(IUserService userService, DataBaseDBContext context)
         {
+            _userService = userService;
             _context = context;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<IEnumerable<UserDto>> GetUsers()
         {
           if (_context.Users == null)
           {
-              return NotFound();
+              return null;
           }
-            return await _context.Users.ToListAsync();
+            return await _userService.GetUsers();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
           if (_context.Users == null)
           {
               return NotFound();
           }
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetUser(id);
 
             if (user == null)
             {
@@ -53,7 +57,7 @@ namespace EmployeeManagement.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UserDto user)
         {
             if (id != user.Id)
             {
@@ -64,7 +68,7 @@ namespace EmployeeManagement.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _userService.UpdateUser(id, user);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,14 +88,13 @@ namespace EmployeeManagement.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(UserDto user)
         {
           if (_context.Users == null)
           {
               return Problem("Entity set 'DataBaseDBContext.Users'  is null.");
           }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _userService.RegisterUser(user);
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
@@ -110,8 +113,7 @@ namespace EmployeeManagement.Controllers
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            await _userService.DeleteUser(id);
 
             return NoContent();
         }

@@ -52,9 +52,19 @@ namespace EmployeeManagement.Repositories
             return userToReturn;
         }
 
-        public Task<UserDto> DeleteUser(int id)
+        public async Task<UserDto> DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            var userItem = await _context.Users.FindAsync(id);
+
+            if (userItem == null)
+            {
+                return null;
+            }
+
+            _context.Users.Remove(userItem);
+            await _context.SaveChangesAsync();
+
+            return UserToDto(userItem);
         }
 
         public async Task<UserDto> GetUser(int id)
@@ -64,12 +74,12 @@ namespace EmployeeManagement.Repositories
             return UserToDto(user);
         }
 
-        public Task<IEnumerable<UserDto>> GetUsers()
+        public async Task<IEnumerable<UserDto>> GetUsers()
         {
-            throw new NotImplementedException();
+            return await _context.Users.Select(u => UserToDto(u)).ToListAsync();
         }
 
-        public async Task<UserLoginDto> LognUser(UserLoginDto userLoginDto)
+        public async Task<UserLoginDto> LoginUser(UserLoginDto userLoginDto)
         {
             var user = await _userManager.FindByNameAsync(userLoginDto.UserName);
 
@@ -88,9 +98,31 @@ namespace EmployeeManagement.Repositories
             return userToReturn;
         }
 
-        public Task<UserDto> UpdateUser(int id, UserDto user)
+        public async Task<UserDto> UpdateUser(int id, UserDto user)
         {
-            throw new NotImplementedException();
+            var userItem = await _context.Users.FindAsync(id);
+
+            if (userItem == null)
+            {
+                return null;
+            }
+
+            userItem.FullName = user.FullName;
+            userItem.UserName = user.UserName;
+            userItem.Email = user.Email;
+            userItem.PasswordHash = user.Password;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "{Repo} All function error", typeof(UserRepository));
+                return new UserDto();
+            }
+
+            return new UserDto();
         }
 
         private async Task<string> GenerateJWToken(User user)
