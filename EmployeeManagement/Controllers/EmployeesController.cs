@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using EmployeeManagement.Repositories;
+using EmployeeManagement.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManagement.Data;
@@ -15,32 +17,25 @@ namespace EmployeeManagement.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly DataBaseDBContext _context;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public EmployeesController(DataBaseDBContext context)
+        public EmployeesController(IEmployeeRepository employeeRepository)
         {
-            _context = context;
+            _employeeRepository = employeeRepository;
         }
 
         // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<IEnumerable<EmployeeDto>> GetEmployees()
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            return await _context.Employees.ToListAsync();
+            return await _employeeRepository.GetEmployees();
         }
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _employeeRepository.GetEmployee(id);
 
             if (employee == null)
             {
@@ -53,18 +48,16 @@ namespace EmployeeManagement.Controllers
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        public async Task<IActionResult> PutEmployee(int id, EmployeeDto employee)
         {
             if (id != employee.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(employee).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _employeeRepository.UpdateEmploye(id, employee);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,14 +77,9 @@ namespace EmployeeManagement.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee)
         {
-          if (_context.Employees == null)
-          {
-              return Problem("Entity set 'DataBaseDBContext.Employees'  is null.");
-          }
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
+            await _employeeRepository.CreateEmploye(employee);
 
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
         }
@@ -100,18 +88,13 @@ namespace EmployeeManagement.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            if (_context.Employees == null)
-            {
-                return NotFound();
-            }
-            var employee = await _context.Employees.FindAsync(id);
+
+            var employee = await _employeeRepository.DeleteEmploye(id);
+
             if (employee == null)
             {
                 return NotFound();
             }
-
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

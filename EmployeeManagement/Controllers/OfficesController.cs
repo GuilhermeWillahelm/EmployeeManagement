@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManagement.Data;
 using EmployeeManagement.Models;
+using EmployeeManagement.Dtos;
+using EmployeeManagement.Repositories;
 
 namespace EmployeeManagement.Controllers
 {
@@ -15,32 +17,25 @@ namespace EmployeeManagement.Controllers
     public class OfficesController : ControllerBase
     {
         private readonly DataBaseDBContext _context;
+        private readonly IOfficeRepository _officeRepository;
 
-        public OfficesController(DataBaseDBContext context)
+        public OfficesController(IOfficeRepository officeRepository)
         {
-            _context = context;
+            _officeRepository = officeRepository;
         }
 
         // GET: api/Offices
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Office>>> GetOffices()
+        public async Task<IEnumerable<OfficeDto>> GetOffices()
         {
-          if (_context.Offices == null)
-          {
-              return NotFound();
-          }
-            return await _context.Offices.ToListAsync();
+            return await _officeRepository.GetOffices();
         }
 
         // GET: api/Offices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Office>> GetOffice(int id)
+        public async Task<ActionResult<OfficeDto>> GetOffice(int id)
         {
-          if (_context.Offices == null)
-          {
-              return NotFound();
-          }
-            var office = await _context.Offices.FindAsync(id);
+            var office = await _officeRepository.GetOffice(id);
 
             if (office == null)
             {
@@ -53,18 +48,16 @@ namespace EmployeeManagement.Controllers
         // PUT: api/Offices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOffice(int id, Office office)
+        public async Task<IActionResult> PutOffice(int id, OfficeDto office)
         {
             if (id != office.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(office).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _officeRepository.UpdateOffice(id, office);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,14 +77,9 @@ namespace EmployeeManagement.Controllers
         // POST: api/Offices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Office>> PostOffice(Office office)
+        public async Task<ActionResult<OfficeDto>> PostOffice(OfficeDto office)
         {
-          if (_context.Offices == null)
-          {
-              return Problem("Entity set 'DataBaseDBContext.Offices'  is null.");
-          }
-            _context.Offices.Add(office);
-            await _context.SaveChangesAsync();
+            await _officeRepository.CreateOffice(office);
 
             return CreatedAtAction("GetOffice", new { id = office.Id }, office);
         }
@@ -100,18 +88,11 @@ namespace EmployeeManagement.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOffice(int id)
         {
-            if (_context.Offices == null)
-            {
-                return NotFound();
-            }
-            var office = await _context.Offices.FindAsync(id);
+            var office = await _officeRepository.DeleteOffice(id);
             if (office == null)
             {
                 return NotFound();
             }
-
-            _context.Offices.Remove(office);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
