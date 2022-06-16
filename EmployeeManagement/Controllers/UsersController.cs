@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using EmployeeManagement.Data;
 using EmployeeManagement.Dtos;
 using EmployeeManagement.Services;
-using EmployeeManagement.Identity;
 
 namespace EmployeeManagement.Controllers
 {
@@ -27,6 +22,7 @@ namespace EmployeeManagement.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IEnumerable<UserDto>> GetUsers()
         {
           if (_context.Users == null)
@@ -88,6 +84,7 @@ namespace EmployeeManagement.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<UserDto>> PostUser(UserDto user)
         {
           if (_context.Users == null)

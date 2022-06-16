@@ -1,5 +1,7 @@
 using System.Text;
 using EmployeeManagement.Data;
+using EmployeeManagement.Repositories;
+using EmployeeManagement.Services;
 using EmployeeManagement.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +18,15 @@ var appSettingsToken = builder.Configuration.GetSection("AppSettings:Token").Val
 var MyAllowSpecificOrigins = "_myAllowSpecifiOrigins";
 
 // Add services to the container.
+builder.Services.AddHttpContextAccessor();
+//Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IOfficeService, OfficeService>();
+//Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IOfficeRepository, OfficeRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -23,9 +34,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataBaseDBContext>(option => option.UseSqlServer(connectionString));
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
 builder.Services.AddCors(opt => 
 {
-    opt.AddPolicy(name: MyAllowSpecificOrigins, builder => { builder.WithOrigins("").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin(); });
+    opt.AddPolicy(name: MyAllowSpecificOrigins, builder => { builder.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin(); });
 });
 
 IdentityBuilder identityBuilder = builder.Services.AddIdentityCore<User>(opt => opt.SignIn.RequireConfirmedEmail = true);

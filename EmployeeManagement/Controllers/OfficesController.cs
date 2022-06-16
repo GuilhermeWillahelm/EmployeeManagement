@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using EmployeeManagement.Data;
 using EmployeeManagement.Models;
 using EmployeeManagement.Dtos;
@@ -26,6 +27,7 @@ namespace EmployeeManagement.Controllers
 
         // GET: api/Offices
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IEnumerable<OfficeDto>> GetOffices()
         {
             return await _officeService.GetOffices();
@@ -33,6 +35,7 @@ namespace EmployeeManagement.Controllers
 
         // GET: api/Offices/5
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<OfficeDto>> GetOffice(int id)
         {
             var office = await _officeService.GetOffice(id);
@@ -48,6 +51,7 @@ namespace EmployeeManagement.Controllers
         // PUT: api/Offices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> PutOffice(int id, OfficeDto office)
         {
             if (id != office.Id)
@@ -77,6 +81,7 @@ namespace EmployeeManagement.Controllers
         // POST: api/Offices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<OfficeDto>> PostOffice(OfficeDto office)
         {
             await _officeService.CreateOffice(office);
@@ -86,6 +91,7 @@ namespace EmployeeManagement.Controllers
 
         // DELETE: api/Offices/5
         [HttpDelete("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> DeleteOffice(int id)
         {
             var office = await _officeService.DeleteOffice(id);

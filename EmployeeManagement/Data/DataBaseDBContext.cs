@@ -28,6 +28,11 @@ namespace EmployeeManagement.Data
                 userRole.HasOne(ur => ur.User).WithMany(r => r.UserRoles)
                 .HasForeignKey(u => u.UserId).IsRequired();
             });
+
+            builder.Entity<Employee>()
+            .HasOne(o => o.Office)
+            .WithMany(e => e.Employees).HasForeignKey(k => k.OfficeId);
+           
         }
     }
 }

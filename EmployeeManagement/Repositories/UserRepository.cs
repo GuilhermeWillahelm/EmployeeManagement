@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using EmployeeManagement.Identity;
 using AutoMapper;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.Repositories
 {
@@ -21,16 +22,14 @@ namespace EmployeeManagement.Repositories
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
-        private readonly ILogger _logger;
 
-        public UserRepository(DataBaseDBContext context, UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IConfiguration confg, ILogger logger)
+        public UserRepository(DataBaseDBContext context, UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IConfiguration confg)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
             _config = confg;
-            _logger = logger;
         }
 
         public async Task<UserDto> RegisterUser(UserDto userDto)
@@ -47,7 +46,7 @@ namespace EmployeeManagement.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error", typeof(UserRepository));
+                Console.WriteLine(ex.Message);
             }
             return userToReturn;
         }
@@ -118,7 +117,7 @@ namespace EmployeeManagement.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{Repo} All function error", typeof(UserRepository));
+                Console.WriteLine(ex.Message);
                 return new UserDto();
             }
 

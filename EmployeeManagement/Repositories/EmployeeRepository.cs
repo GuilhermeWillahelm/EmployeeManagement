@@ -10,21 +10,23 @@ namespace EmployeeManagement.Repositories
         private readonly DataBaseDBContext _context;
         private readonly ILogger _logger;
 
-        public EmployeeRepository(DataBaseDBContext context, ILogger logger)
+        public EmployeeRepository(DataBaseDBContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         public async Task<EmployeeDto> CreateEmploye(EmployeeDto employee)
         {
+            var offId = _context.Offices.Find(employee.OfficeId);
             var employeeItem = new Employee
             {
                 FullName = employee.FullName,
-                CreatedDate = DateTime.Now,
+                CreatedDate = employee.CreatedDate,
                 Salary = employee.Salary,
-                OfficeId = employee.OfficeId,
+                OfficeId = offId.Id
             };
+
+            
 
             _context.Employees.Add(employeeItem);
             await _context.SaveChangesAsync();
@@ -49,14 +51,14 @@ namespace EmployeeManagement.Repositories
 
         public async Task<EmployeeDto> GetEmployee(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees.Include(o => o.Office).Where(e => e.Id == id).FirstOrDefaultAsync();
 
             return EmployeeToDto(employee);
         }
 
         public async Task<IEnumerable<EmployeeDto>> GetEmployees()
         {
-            return await _context.Employees.Select(c => EmployeeToDto(c)).ToListAsync();
+            return await _context.Employees.Include(o => o.Office).Select(c => EmployeeToDto(c)).ToListAsync();
         }
 
         public async Task<EmployeeDto> UpdateEmploye(int id, EmployeeDto employee)
@@ -84,7 +86,6 @@ namespace EmployeeManagement.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{Repo} All function error", typeof(EmployeeRepository));
                 return new EmployeeDto();   
             }
 
@@ -99,7 +100,13 @@ namespace EmployeeManagement.Repositories
                     FullName = employee.FullName,
                     CreatedDate = employee.CreatedDate,
                     Salary = employee.Salary,
-                    OfficeId = employee.OfficeId
+                    OfficeId = employee.OfficeId,
+                    OfficeDto = new OfficeDto
+                    {
+                        Id = employee.Office.Id,
+                        NameOffice = employee.Office.NameOffice
+                    }
+                    
                 }; 
     }
 }

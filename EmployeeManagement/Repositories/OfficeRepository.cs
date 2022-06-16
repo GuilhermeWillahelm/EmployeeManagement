@@ -10,10 +10,9 @@ namespace EmployeeManagement.Repositories
         private readonly DataBaseDBContext _context;
         private readonly ILogger _logger;
 
-        public OfficeRepository(DataBaseDBContext context, ILogger logger)
+        public OfficeRepository(DataBaseDBContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         public async Task<OfficeDto> CreateOffice(OfficeDto officeDto)
@@ -80,7 +79,6 @@ namespace EmployeeManagement.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{Repo} All function error", typeof(OfficeRepository));
                 return new OfficeDto();
             }
 

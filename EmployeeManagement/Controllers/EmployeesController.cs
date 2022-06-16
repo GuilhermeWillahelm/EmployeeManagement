@@ -7,6 +7,7 @@ using EmployeeManagement.Repositories;
 using EmployeeManagement.Services;
 using EmployeeManagement.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManagement.Data;
 using EmployeeManagement.Models;
@@ -27,6 +28,7 @@ namespace EmployeeManagement.Controllers
 
         // GET: api/Employees
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IEnumerable<EmployeeDto>> GetEmployees()
         {
             return await _employeeService.GetEmployees();
@@ -34,6 +36,7 @@ namespace EmployeeManagement.Controllers
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
             var employee = await _employeeService.GetEmployee(id);
@@ -49,6 +52,7 @@ namespace EmployeeManagement.Controllers
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> PutEmployee(int id, EmployeeDto employee)
         {
             if (id != employee.Id)
@@ -78,6 +82,7 @@ namespace EmployeeManagement.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee)
         {
             await _employeeService.CreateEmploye(employee);
@@ -87,6 +92,7 @@ namespace EmployeeManagement.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
 
